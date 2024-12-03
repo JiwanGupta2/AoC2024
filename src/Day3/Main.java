@@ -42,15 +42,16 @@ public class Main {
                 index = dontMatcher.end();
             }
 
-            while (mulMatcher.find(index)) {
+            if (mulMatcher.find(index)) {
                 String mulStatement = mulMatcher.group();
-
                 if (enabled) {
                     int xyMultiplied = getXyMultiplied(mulStatement);
                     addedMatches += xyMultiplied;
                 }
                 matchCount++;
                 index = mulMatcher.end();
+            } else {
+                break;
             }
         }
 
