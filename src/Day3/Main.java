@@ -11,28 +11,51 @@ import java.util.regex.Pattern;
 public class Main {
 
     private static final String PART1_FILE_PATH = "src/Day3/input.txt";
-    private static final Pattern MUL_MATCHER = Pattern.compile("mul\\((\\d{1,3}),(\\d{1,3})\\)");
+    private static final Pattern MUL_PATTERN = Pattern.compile("mul\\((\\d{1,3}),(\\d{1,3})\\)");
+    // looking for anything that has mul(x,y) where x,y are 1-3 digit numbers
+    private static final Pattern DO_PATTERN = Pattern.compile("do");
+    private static final Pattern DONT_PATTERN = Pattern.compile("don't");
+    // potential issue this way is that every time we find "don't" we'll also find "do"
+    // so need to make sure we find "do" first in this case
 
     @SneakyThrows
     public static void main(String[] args) {
-
         Path filePath = Paths.get(PART1_FILE_PATH);
-
         String input = Files.readString(filePath);
-        Matcher mulmatcher = MUL_MATCHER.matcher(input);
+        Matcher mulMatcher = MUL_PATTERN.matcher(input);
         int matchCount = 0;
         int addedMatches = 0;
 
-        while (mulmatcher.find()) {
-            String mulStatement = mulmatcher.group();
-            int xyMultiplied = getXyMultiplied(mulStatement);
-            addedMatches = addedMatches + xyMultiplied;
-            matchCount++;
+        boolean enabled = true;
+        Matcher doMatcher = DO_PATTERN.matcher(input);
+        Matcher dontMatcher = DONT_PATTERN.matcher(input);
+
+        int index = 0;
+        while (index < input.length()) {
+            if (doMatcher.find(index)) {
+                System.out.println("Do found, enabling...");
+                enabled = true;
+                index = doMatcher.end();
+            } else if (dontMatcher.find(index)) {
+                System.out.println("Don't found, disabling...");
+                enabled = false;
+                index = dontMatcher.end();
+            }
+
+            while (mulMatcher.find(index)) {
+                String mulStatement = mulMatcher.group();
+
+                if (enabled) {
+                    int xyMultiplied = getXyMultiplied(mulStatement);
+                    addedMatches += xyMultiplied;
+                }
+                matchCount++;
+                index = mulMatcher.end();
+            }
         }
 
-        int output = addedMatches;
-        System.out.println("Match count :" + matchCount);
-        System.out.println("Output :" + output);
+        System.out.println("Match count: " + matchCount);
+        System.out.println("Output: " + addedMatches);
     }
 
     private static int getXyMultiplied(String mulStatement) {
