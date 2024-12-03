@@ -26,27 +26,38 @@ public class Main {
         int matchCount = 0;
         int addedMatches = 0;
 
+        int doCount = 0;
+        int dontCount = 0;
+
         boolean enabled = true;
         Matcher doMatcher = DO_PATTERN.matcher(input);
         Matcher dontMatcher = DONT_PATTERN.matcher(input);
 
         int index = 0;
         while (index < input.length()) {
-            if (doMatcher.find(index)) {
-                System.out.println("Do found, enabling...");
-                enabled = true;
-                index = doMatcher.end();
-            } else if (dontMatcher.find(index)) {
+            if (dontMatcher.find(index)) {
+                dontCount++;
+                System.out.println("Don't count: " + dontCount);
                 System.out.println("Don't found, disabling...");
                 enabled = false;
                 index = dontMatcher.end();
             }
+            if (doMatcher.find(index)) {
+                doCount++;
+                System.out.println("Do count: " + doCount);
+                System.out.println("Do found, enabling...");
+                enabled = true;
+                index = doMatcher.end();
+            }
 
             if (mulMatcher.find(index)) {
                 String mulStatement = mulMatcher.group();
+                System.out.println("Mul statement: " + mulStatement);
                 if (enabled) {
                     int xyMultiplied = getXyMultiplied(mulStatement);
+                    System.out.println("xy multiplied: " + xyMultiplied);
                     addedMatches += xyMultiplied;
+                    System.out.println("Added matches: " + addedMatches);
                 }
                 matchCount++;
                 index = mulMatcher.end();
