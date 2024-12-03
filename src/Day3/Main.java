@@ -13,8 +13,8 @@ public class Main {
     private static final String PART1_FILE_PATH = "src/Day3/input.txt";
     private static final Pattern MUL_PATTERN = Pattern.compile("mul\\((\\d{1,3}),(\\d{1,3})\\)");
     // looking for anything that has mul(x,y) where x,y are 1-3 digit numbers
-    private static final Pattern DO_PATTERN = Pattern.compile("do");
-    private static final Pattern DONT_PATTERN = Pattern.compile("don't");
+    private static final Pattern DO_PATTERN = Pattern.compile("do()");
+    private static final Pattern DONT_PATTERN = Pattern.compile("don't()");
     // potential issue this way is that every time we find "don't" we'll also find "do"
     // so need to make sure we find "do" first in this case
 
@@ -35,19 +35,19 @@ public class Main {
 
         int index = 0;
         while (index < input.length()) {
-            if (dontMatcher.find(index)) {
-                dontCount++;
-                System.out.println("Don't count: " + dontCount);
-                System.out.println("Don't found, disabling...");
-                enabled = false;
-                index = dontMatcher.end();
-            }
             if (doMatcher.find(index)) {
                 doCount++;
                 System.out.println("Do count: " + doCount);
                 System.out.println("Do found, enabling...");
                 enabled = true;
                 index = doMatcher.end();
+            }
+             if (dontMatcher.find(index)) {
+                dontCount++;
+                System.out.println("Don't count: " + dontCount);
+                System.out.println("Don't found, disabling...");
+                enabled = false;
+                index = dontMatcher.end();
             }
 
             if (mulMatcher.find(index)) {
