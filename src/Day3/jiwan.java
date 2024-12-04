@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Main {
+public class jiwan {
 
     private static final String FILE_PATH = "src/Day3/input.txt";
     private static final Pattern MUL_PATTERN = Pattern.compile("mul\\((\\d{1,3}),(\\d{1,3})\\)");
