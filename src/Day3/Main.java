@@ -10,64 +10,58 @@ import java.util.regex.Pattern;
 
 public class Main {
 
-    private static final String PART1_FILE_PATH = "src/Day3/input.txt";
+    private static final String FILE_PATH = "src/Day3/input.txt";
     private static final Pattern MUL_PATTERN = Pattern.compile("mul\\((\\d{1,3}),(\\d{1,3})\\)");
     // looking for anything that has mul(x,y) where x,y are 1-3 digit numbers
     private static final Pattern DO_PATTERN = Pattern.compile("do()");
     private static final Pattern DONT_PATTERN = Pattern.compile("don't()");
     // potential issue this way is that every time we find "don't" we'll also find "do"
-    // so need to make sure we find "do" first in this case
 
     @SneakyThrows
     public static void main(String[] args) {
-        Path filePath = Paths.get(PART1_FILE_PATH);
+        Path filePath = Paths.get(FILE_PATH);
         String input = Files.readString(filePath);
-        Matcher mulMatcher = MUL_PATTERN.matcher(input);
+
+        Matcher mulMatch = MUL_PATTERN.matcher(input);
+        Matcher doMatch = DO_PATTERN.matcher(input);
+        Matcher dontMatch = DONT_PATTERN.matcher(input);
+
+        boolean enabled = true;
         int matchCount = 0;
         int addedMatches = 0;
 
-        int doCount = 0;
-        int dontCount = 0;
-
-        boolean enabled = true;
-        Matcher doMatcher = DO_PATTERN.matcher(input);
-        Matcher dontMatcher = DONT_PATTERN.matcher(input);
-
         int index = 0;
         while (index < input.length()) {
-            if (doMatcher.find(index)) {
-                doCount++;
-                System.out.println("Do count: " + doCount);
-                System.out.println("Do found, enabling...");
-                enabled = true;
-                index = doMatcher.end();
-            }
-             if (dontMatcher.find(index)) {
-                dontCount++;
-                System.out.println("Don't count: " + dontCount);
-                System.out.println("Don't found, disabling...");
-                enabled = false;
-                index = dontMatcher.end();
+            boolean mulFound = mulMatch.find(index);
+            boolean dontFound = dontMatch.find(index);
+            boolean doFound = doMatch.find(index);
+
+            if (!mulFound && !dontFound) {
+                break;
             }
 
-            if (mulMatcher.find(index)) {
-                String mulStatement = mulMatcher.group();
-                System.out.println("Mul statement: " + mulStatement);
+            if (dontFound && (dontMatch.start() < mulMatch.start())) {
+                enabled = false;
+                index = dontMatch.end();
+            } else if (doFound && (doMatch.start() < mulMatch.start())) {
+                enabled = true;
+                index = doMatch.end();
+            }
+            else {
                 if (enabled) {
+                    String mulStatement = mulMatch.group();
+                    System.out.println("Mul statement to be added: " + mulStatement);
                     int xyMultiplied = getXyMultiplied(mulStatement);
-                    System.out.println("xy multiplied: " + xyMultiplied);
                     addedMatches += xyMultiplied;
-                    System.out.println("Added matches: " + addedMatches);
                 }
                 matchCount++;
-                index = mulMatcher.end();
-            } else {
-                break;
+                index = mulMatch.end();
             }
         }
 
+        int output = addedMatches;
         System.out.println("Match count: " + matchCount);
-        System.out.println("Output: " + addedMatches);
+        System.out.println("Output: " + output);
     }
 
     private static int getXyMultiplied(String mulStatement) {
@@ -80,6 +74,6 @@ public class Main {
         int x = Integer.parseInt(parts[0]);
         int y = Integer.parseInt(parts[1]);
 
-        return x*y;
+        return x * y;
     }
 }
